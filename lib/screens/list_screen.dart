@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/detail_screen.dart';
 import '../screens/photo_screen.dart';
 import '../widgets/wasteagram_scaffold.dart';
 
@@ -46,7 +47,7 @@ class _ListScreenState extends State<ListScreen> {
       leading: Text(document['date'].toDate().toString()),
       trailing: Text(document['quantity'].toString()),
       onTap: () {
-        
+        Navigator.of(context).pushNamed(DetailScreen.routeName);
       },
     );
   }
