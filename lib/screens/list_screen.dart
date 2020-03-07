@@ -43,8 +43,11 @@ class _ListScreenState extends State<ListScreen> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     return ListTile(
-      leading: document['date'],
-      trailing: document['quantity'],
+      leading: Text(document['date'].toDate().toString()),
+      trailing: Text(document['quantity'].toString()),
+      onTap: () {
+        
+      },
     );
   }
 }
