@@ -22,19 +22,49 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
 
-    final Post args = ModalRoute.of(context).settings.arguments;
+    final Post post = ModalRoute.of(context).settings.arguments;
 
     return WastegramScaffold(
       title: 'Wasteagram',
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(args.date.toString()),
-          Placeholder(),
-          Text(args.quantity.toString()),
-          Text('(${args.latitude}, ${args.longitude})')
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(post.getFormattedDateYear(), style: TextStyle(fontSize: 24.0)),
+            SizedBox(height: 10.0),
+            imageLoading(context, post),
+            SizedBox(height: 10.0),
+            Text('Items: ${post.quantity.toString()}', style: TextStyle(fontSize: 24.0)),
+            SizedBox(height: 10.0),
+            Text('(${post.latitude}, ${post.longitude})')
+          ],
+        ),
       )
+    );
+  }
+
+  Widget imageLoading(BuildContext context, Post post) {
+    return Image.network(
+      post.imageURL.toString(),
+      width: MediaQuery.of(context).size.width * .8,
+      height: MediaQuery.of(context).size.width * .5,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+        return SizedBox(
+          width: MediaQuery.of(context).size.width * .8,
+          height: MediaQuery.of(context).size.width * .5,
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
+                  : null,
+            )
+          )
+        );
+      },
     );
   }
 }

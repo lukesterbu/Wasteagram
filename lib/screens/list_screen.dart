@@ -46,7 +46,7 @@ class _ListScreenState extends State<ListScreen> {
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     Post post = Post.fromFirestore(document);
     return ListTile(
-      leading: Text(post.date.toString()),
+      title: Text(post.getFormattedDate()),
       trailing: Text(post.quantity.toString()),
       onTap: () {
         Navigator.pushNamed(
