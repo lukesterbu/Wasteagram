@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/post.dart';
 import '../screens/detail_screen.dart';
 import '../screens/photo_screen.dart';
 import '../widgets/wasteagram_scaffold.dart';
@@ -43,11 +44,16 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
+    Post post = Post.fromFirestore(document);
     return ListTile(
-      leading: Text(document['date'].toDate().toString()),
-      trailing: Text(document['quantity'].toString()),
+      leading: Text(post.date.toString()),
+      trailing: Text(post.quantity.toString()),
       onTap: () {
-        Navigator.of(context).pushNamed(DetailScreen.routeName);
+        Navigator.pushNamed(
+          context,
+          DetailScreen.routeName,
+          arguments: post
+        );
       },
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
+import '../models/post.dart';
 import '../widgets/wasteagram_scaffold.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -12,53 +12,29 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
 
-  DateTime date;
   Image image;
-  int items;
-  LocationData locationData;
 
   @override
   void initState() {
     super.initState();
-    getNumItems();
-    retrieveLocation();
-  }
-
-  void getNumItems() {
-    items = 0;
-  }
-
-  void retrieveLocation() async {
-    var locationService = Location();
-    locationData = await locationService.getLocation();
-    setState( () {});
   }
 
   @override
   Widget build(BuildContext context) {
+
+    final Post args = ModalRoute.of(context).settings.arguments;
+
     return WastegramScaffold(
       title: 'Wasteagram',
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Date'),
+          Text(args.date.toString()),
           Placeholder(),
-          numItems(context),
-          location(context)
+          Text(args.quantity.toString()),
+          Text('(${args.latitude}, ${args.longitude})')
         ],
       )
     );
-  }
-
-  Widget numItems(BuildContext context) {
-    return Text('Items: $items');
-  }
-
-  Widget location(BuildContext context) {
-    if (locationData == null) {
-      return CircularProgressIndicator();
-    } else {
-      return Text('(${locationData.latitude}, ${locationData.longitude})');
-    }
   }
 }
