@@ -24,7 +24,6 @@ dependencies:
   firebase_core: 0.4.4
   image_picker: ^0.6.3+4
   location: ^2.5.3
-  
 
 dev_dependencies:
   flutter_test:
