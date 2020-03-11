@@ -38,3 +38,4 @@ lib/generated_plugin_registrant.dart
 
 # Google API
 GoogleService-Info.plist
+google-services.json
