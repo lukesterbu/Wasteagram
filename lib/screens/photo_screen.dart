@@ -41,6 +41,14 @@ class _PhotoScreenState extends State<PhotoScreen> {
     setState( () {});
   }
 
+  double getWidthOf(context) {
+    return MediaQuery.of(context).size.width * .8;
+  }
+
+  double getHeightOf(context) {
+    return MediaQuery.of(context).size.height * .5;
+  }
+
   Future uploadImage() async {
     StorageReference storageReference = FirebaseStorage.instance.ref().child('${Timestamp.now()}pic');
     StorageUploadTask uploadTask = storageReference.putFile(image);
@@ -53,6 +61,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
     return WastegramScaffold(
       title: 'Wasteagram',
       child: imagePicker(context),
+      //fab: photoScreenFab(context)
     );
   }
 
@@ -78,54 +87,71 @@ class _PhotoScreenState extends State<PhotoScreen> {
       children: [
         Image.file(
           image,
-          width: MediaQuery.of(context).size.width * .8,
-          height: MediaQuery.of(context).size.width * .5,
+          width: getWidthOf(context),
+          height: getWidthOf(context)
         ),
         SizedBox(height: 40),
         // Number of items field
         numItems(context),
+        SizedBox(height: 40),
         postButton(context),
       ],
     );
   }
 
   Widget numItems(BuildContext context) {
-    return TextFormField(
-      autofocus: true,
-      inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-      onSaved: (value) {
-        post.quantity = num.parse(value);
-      },
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'Please enter a quantity of items!';
-        }
-        else if (num.parse(value) == 0) {
-          return 'Please enter a quantity greater than 0!';
-        }
-        return null;
-      },
+    return Container(
+      width: getWidthOf(context),
+      child: TextFormField(
+        decoration: InputDecoration(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.greenAccent, width: 5.0),
+          ),
+          labelText: 'Number of wasted items'
+        ),
+        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+        onSaved: (value) {
+          post.quantity = num.parse(value);
+        },
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'Please enter a quantity of items!';
+          }
+          else if (num.parse(value) == 0) {
+            return 'Please enter a quantity greater than 0!';
+          }
+          return null;
+        },
+      ),
     );
   }
 
   Widget postButton(BuildContext context) {
-    return RaisedButton(
-      child: Text('Post It!'),
-      onPressed: () async {
-        if (_formKey.currentState.validate()) {
-          // Save the form
-          _formKey.currentState.save();
-          // Add image to firebase storage
-          await uploadImage();
-          // Create database transfer object
-          post.imageURL = url;
-          post.location = GeoPoint(location.latitude, location.longitude);
-          // Add to database
-          post.addToFirestore();
-          // Navigate back to list_screen
-          Navigator.of(context).pop();
-        }
-      },
+    return SizedBox(
+      width: getWidthOf(context),
+      height: MediaQuery.of(context).size.width * .2,
+      child: RaisedButton(
+        child: Icon(
+          Icons.cloud_upload,
+          size: 70,
+        ),
+        onPressed: () async {
+          if (_formKey.currentState.validate()) {
+            
+            // Save the form
+            _formKey.currentState.save();
+            // Add image to firebase storage
+            await uploadImage();
+            // Create database transfer object
+            post.imageURL = url;
+            post.location = GeoPoint(location.latitude, location.longitude);
+            // Add to database
+            post.addToFirestore();
+            // Navigate back to list_screen
+            Navigator.of(context).pop();
+          }
+        },
+      ),
     );
   }
 }
