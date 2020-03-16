@@ -21,7 +21,7 @@ void main() {
 
   test('Create Post from Firestore', () {
     // May have to change the document id if it's not there
-    Firestore.instance.collection('posts').orderBy('date', descending: true).limit(1).get().then((DocumentSnapshot ds) {
+    Firestore.instance.collection('posts').document('2TaJdZdDPEHVfdq6tXxA').get().then((DocumentSnapshot ds) {
       Post post = Post.fromFirestore(ds);
 
       expect(post.date, ds['date']);

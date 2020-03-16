@@ -39,7 +39,7 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(post.getFormattedDateYear(), style: TextStyle(fontSize: 24.0)),
+            Text(post.getFormattedDate(), style: TextStyle(fontSize: 24.0)),
             SizedBox(height: 10.0),
             imageLoading(context, post),
             SizedBox(height: 10.0),
