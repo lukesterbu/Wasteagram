@@ -35,9 +35,14 @@ class _ListScreenState extends State<ListScreen> {
     return WastegramScaffold(
       title: 'Wasteagram - $totalWasted',
       child: postList(context),
-      fab: FloatingActionButton(
-        onPressed: () => Navigator.of(context).pushNamed(PhotoScreen.routeName),
-        child: Icon(Icons.camera_alt),
+      fab: Semantics(
+        label: 'Button to add new post',
+        enabled: true,
+        button: true,
+        child: FloatingActionButton(
+          onPressed: () => Navigator.of(context).pushNamed(PhotoScreen.routeName),
+          child: Icon(Icons.camera_alt),
+        ),
       )
     );
   }
@@ -60,16 +65,22 @@ class _ListScreenState extends State<ListScreen> {
 
   Widget _buildListItem(BuildContext context, DocumentSnapshot document) {
     Post post = Post.fromFirestore(document);
-    return ListTile(
-      title: Text(post.getFormattedDate()),
-      trailing: Text(post.quantity.toString()),
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          DetailScreen.routeName,
-          arguments: post
-        );
-      },
+    return Semantics(
+      button: true,
+      enabled: true,
+      image: false,
+      label: 'Object in list that can be clicked to view details',
+      child: ListTile(
+        title: Text(post.getFormattedDate()),
+        trailing: Text(post.quantity.toString()),
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            DetailScreen.routeName,
+            arguments: post
+          );
+        },
+      ),
     );
   }
 }
