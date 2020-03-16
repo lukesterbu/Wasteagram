@@ -36,9 +36,17 @@ class _PhotoScreenState extends State<PhotoScreen> {
     setState( () {});
   }
 
-  void getImage() async {
-    image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  void getImage(ImageSource type) async {
+    image = await ImagePicker.pickImage(source: type);
     setState( () {});
+  }
+
+  double getWidthOf(context) {
+    return MediaQuery.of(context).size.width * .8;
+  }
+
+  double getHeightOf(context) {
+    return MediaQuery.of(context).size.height * .5;
   }
 
   Future uploadImage() async {
@@ -53,79 +61,126 @@ class _PhotoScreenState extends State<PhotoScreen> {
     return WastegramScaffold(
       title: 'Wasteagram',
       child: imagePicker(context),
+      //fab: photoScreenFab(context)
     );
   }
 
   Widget imagePicker(BuildContext context) {
     if (image == null) {
-      return RaisedButton(
-        child: Text('Select Photo'),
-        onPressed: () {
-          getImage();
-        }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          imageButtons(context, 'Take Photo using Camera', ImageSource.camera),
+          imageButtons(context, 'Select Photo from Gallery', ImageSource.gallery),
+        ],
       );
     } else {
-      return Form(
-        key: _formKey,
-        child: formLayout(context)
+      return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Form(
+          key: _formKey,
+          child: formLayout(context)
+        ),
       );
     }
   }
 
+  Widget imageButtons(BuildContext context, String text, ImageSource imageSource) {
+    return Semantics(
+      child: RaisedButton(
+        child: Text(text),
+        onPressed: () {
+          getImage(imageSource);
+        },
+      ),
+      button: true,
+      enabled: true,
+      label: text,
+      readOnly: false,
+    );
+  }
+
   Widget formLayout(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.file(
-          image,
-          width: MediaQuery.of(context).size.width * .8,
-          height: MediaQuery.of(context).size.width * .5,
-        ),
-        SizedBox(height: 40),
-        // Number of items field
-        numItems(context),
-        postButton(context),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.file(
+            image,
+            width: getWidthOf(context),
+            height: getWidthOf(context)
+          ),
+          SizedBox(height: 40),
+          // Number of items field
+          numItems(context),
+          SizedBox(height: 40),
+          postButton(context),
+        ],
+      ),
     );
   }
 
   Widget numItems(BuildContext context) {
-    return TextFormField(
-      autofocus: true,
-      inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-      onSaved: (value) {
-        post.quantity = num.parse(value);
-      },
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'Please enter a quantity of items!';
-        }
-        else if (num.parse(value) == 0) {
-          return 'Please enter a quantity greater than 0!';
-        }
-        return null;
-      },
+    return Container(
+      width: getWidthOf(context),
+      child: TextFormField(
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.greenAccent, width: 5.0),
+          ),
+          labelText: 'Number of wasted items'
+        ),
+        inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+        onSaved: (value) {
+          post.quantity = num.parse(value);
+        },
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'Please enter the number of wasted items!';
+          }
+          else if (num.parse(value) == 0) {
+            return 'Please enter a number greater than 0!';
+          }
+          return null;
+        },
+      ),
     );
   }
 
   Widget postButton(BuildContext context) {
-    return RaisedButton(
-      child: Text('Post It!'),
-      onPressed: () async {
-        if (_formKey.currentState.validate()) {
-          // Save the form
-          _formKey.currentState.save();
-          // Add image to firebase storage
-          await uploadImage();
-          // Create database transfer object
-          post.imageURL = url;
-          post.location = GeoPoint(location.latitude, location.longitude);
-          // Add to database
-          post.addToFirestore();
-          // Navigate back to list_screen
-          Navigator.of(context).pop();
-        }
-      },
+    bool isDisabled = false;
+
+    return SizedBox(
+      width: getWidthOf(context),
+      height: MediaQuery.of(context).size.width * .2,
+      child: RaisedButton(
+        child: Icon(
+          Icons.cloud_upload,
+          size: 70,
+        ),
+        onPressed: () async {
+          if (isDisabled) {
+            return;
+          }
+          if (_formKey.currentState.validate()) {
+            isDisabled = true;
+            // Save the form
+            _formKey.currentState.save();
+            // Add image to firebase storage
+            await uploadImage();
+            // Create database transfer object
+            post.imageURL = url;
+            post.location = GeoPoint(location.latitude, location.longitude);
+            // Add to database
+            post.addToFirestore();
+            // Navigate back to list_screen
+            Navigator.of(context).pop();
+          }
+        },
+      ),
     );
   }
 }

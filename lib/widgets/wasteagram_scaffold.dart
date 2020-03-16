@@ -5,7 +5,7 @@ class WastegramScaffold extends StatelessWidget {
 
   final String title;
   final Widget child;
-  final FloatingActionButton fab;
+  final Widget fab;
 
   @override
   Widget build(BuildContext context) {

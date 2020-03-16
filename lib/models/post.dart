@@ -20,11 +20,7 @@ class Post {
     );
   }
 
-  String getFormattedDateYear() {
-    return formatDate(this.date, [DD, ', ', M, ' ', d, ', ', yyyy]);
-  }
-
   String getFormattedDate() {
-    return formatDate(this.date, [DD, ', ', M, ' ', d]);
+    return formatDate(this.date, [DD, ', ', M, ' ', d, ', ', yyyy]);
   }
 }

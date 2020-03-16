@@ -19,6 +19,14 @@ class _DetailScreenState extends State<DetailScreen> {
     super.initState();
   }
 
+  double getImageWidth(context) {
+    return MediaQuery.of(context).size.width * .8;
+  }
+
+  double getImageHeight(context) {
+    return MediaQuery.of(context).size.height * .3;
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -31,7 +39,7 @@ class _DetailScreenState extends State<DetailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(post.getFormattedDateYear(), style: TextStyle(fontSize: 24.0)),
+            Text(post.getFormattedDate(), style: TextStyle(fontSize: 24.0)),
             SizedBox(height: 10.0),
             imageLoading(context, post),
             SizedBox(height: 10.0),
@@ -45,26 +53,32 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget imageLoading(BuildContext context, Post post) {
-    return Image.network(
-      post.imageURL.toString(),
-      width: MediaQuery.of(context).size.width * .8,
-      height: MediaQuery.of(context).size.width * .5,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return SizedBox(
-          width: MediaQuery.of(context).size.width * .8,
-          height: MediaQuery.of(context).size.width * .5,
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
-                  : null,
+    return Semantics(
+      button: false,
+      readOnly: true,
+      image: true,
+      label: 'Picture of wasted food',
+      child: Image.network(
+        post.imageURL.toString(),
+        width: getImageWidth(context),
+        height: getImageHeight(context),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+          return SizedBox(
+            width: getImageWidth(context),
+            height: getImageHeight(context),
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
+                    : null,
+              )
             )
-          )
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
