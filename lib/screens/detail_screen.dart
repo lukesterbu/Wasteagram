@@ -53,26 +53,32 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget imageLoading(BuildContext context, Post post) {
-    return Image.network(
-      post.imageURL.toString(),
-      width: getImageWidth(context),
-      height: getImageHeight(context),
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return SizedBox(
-          width: getImageWidth(context),
-          height: getImageHeight(context),
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
-                  : null,
+    return Semantics(
+      button: false,
+      readOnly: true,
+      image: true,
+      label: 'Picture of wasted food',
+      child: Image.network(
+        post.imageURL.toString(),
+        width: getImageWidth(context),
+        height: getImageHeight(context),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+          return SizedBox(
+            width: getImageWidth(context),
+            height: getImageHeight(context),
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes
+                    : null,
+              )
             )
-          )
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

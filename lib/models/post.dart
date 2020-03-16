@@ -25,6 +25,6 @@ class Post {
   }
 
   String getFormattedDate() {
-    return formatDate(this.date, [DD, ', ', M, ' ', d]);
+    return formatDate(this.date, [DD, ', ', M, ' ', d, ', ', yyyy]);
   }
 }

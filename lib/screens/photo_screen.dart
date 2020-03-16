@@ -36,8 +36,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
     setState( () {});
   }
 
-  void getImage() async {
-    image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  void getImage(ImageSource type) async {
+    image = await ImagePicker.pickImage(source: type);
     setState( () {});
   }
 
@@ -67,35 +67,58 @@ class _PhotoScreenState extends State<PhotoScreen> {
 
   Widget imagePicker(BuildContext context) {
     if (image == null) {
-      return RaisedButton(
-        child: Text('Select Photo'),
-        onPressed: () {
-          getImage();
-        }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          imageButtons(context, 'Take Photo using Camera', ImageSource.camera),
+          imageButtons(context, 'Select Photo from Gallery', ImageSource.gallery),
+        ],
       );
     } else {
-      return Form(
-        key: _formKey,
-        child: formLayout(context)
+      return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Form(
+          key: _formKey,
+          child: formLayout(context)
+        ),
       );
     }
   }
 
+  Widget imageButtons(BuildContext context, String text, ImageSource imageSource) {
+    return Semantics(
+      child: RaisedButton(
+        child: Text(text),
+        onPressed: () {
+          getImage(imageSource);
+        },
+      ),
+      button: true,
+      enabled: true,
+      label: text,
+      readOnly: false,
+    );
+  }
+
   Widget formLayout(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.file(
-          image,
-          width: getWidthOf(context),
-          height: getWidthOf(context)
-        ),
-        SizedBox(height: 40),
-        // Number of items field
-        numItems(context),
-        SizedBox(height: 40),
-        postButton(context),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.file(
+            image,
+            width: getWidthOf(context),
+            height: getWidthOf(context)
+          ),
+          SizedBox(height: 40),
+          // Number of items field
+          numItems(context),
+          SizedBox(height: 40),
+          postButton(context),
+        ],
+      ),
     );
   }
 
@@ -103,6 +126,7 @@ class _PhotoScreenState extends State<PhotoScreen> {
     return Container(
       width: getWidthOf(context),
       child: TextFormField(
+        keyboardType: TextInputType.number,
         decoration: InputDecoration(
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.greenAccent, width: 5.0),
@@ -115,10 +139,10 @@ class _PhotoScreenState extends State<PhotoScreen> {
         },
         validator: (value) {
           if (value.isEmpty) {
-            return 'Please enter a quantity of items!';
+            return 'Please enter the number of wasted items!';
           }
           else if (num.parse(value) == 0) {
-            return 'Please enter a quantity greater than 0!';
+            return 'Please enter a number greater than 0!';
           }
           return null;
         },
@@ -127,6 +151,8 @@ class _PhotoScreenState extends State<PhotoScreen> {
   }
 
   Widget postButton(BuildContext context) {
+    bool isDisabled = false;
+
     return SizedBox(
       width: getWidthOf(context),
       height: MediaQuery.of(context).size.width * .2,
@@ -136,8 +162,11 @@ class _PhotoScreenState extends State<PhotoScreen> {
           size: 70,
         ),
         onPressed: () async {
+          if (isDisabled) {
+            return;
+          }
           if (_formKey.currentState.validate()) {
-            
+            isDisabled = true;
             // Save the form
             _formKey.currentState.save();
             // Add image to firebase storage
